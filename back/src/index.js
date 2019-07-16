@@ -4,9 +4,6 @@ import initializeDatabase from './db'
 
 const start = async()=>{
 const controller = await initializeDatabase();
-const list = await controller.getContactsList();
-console.log(list);
-
 
 app.get('/', (req, res)=>{
   res.send('ok')
