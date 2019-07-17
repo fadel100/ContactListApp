@@ -2,25 +2,50 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
-function App() {
+/**
+    * My component App that prints the list of contacts
+    *
+    * @namespace App
+    */
+
+class App extends React.Component {
+
+  /**
+        * @type {object}
+        * @property {array} contacts - holds the contact objects
+        */
+
+  state={
+    contacts:[]
+  }
+
+  async componentDidMount(){
+
+    try{const response = await fetch('http://localhost:8080/contacts/list')
+    const result = await response.json();
+    this.setState({contacts:result})}
+    catch(err){
+      console.log("error",err)
+    }
+   // console.log("I got a response", result);
+  }
+  /**
+        * Renders the component.
+        * @function
+        * @return {ReactElement} markup
+        *
+        */
+
+  render(){
   return (
+   
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {this.state.contacts.map(contact=>(
+        <div key={contact.id}>{contact.name}</div>
+      ))}
     </div>
   );
+  }
 }
 
 export default App;

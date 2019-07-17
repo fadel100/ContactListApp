@@ -17,11 +17,8 @@ const initializeDatabase = async () => {
     const rows = await db.all(
       "SELECT contact_id AS id, name, email FROM contacts"
     );
-    rows.forEach(
-      ({ id, name, email }) =>
-        (returnString += `[id:${id}] - ${name} - ${email}`)
-    );
-    return returnString;
+    
+    return rows;
   };
 
 
