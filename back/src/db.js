@@ -26,12 +26,12 @@ const initializeDatabase = async () => {
     const rows = await db.all(stmt);
     if(rows.length === 0)
     {
-      throw Error("no contacts found!")
+      throw new Error("no contacts found!")
     }
     return rows;}
     catch(err)
     {
-      throw Error("could not retrieve list!")
+      throw new Error("could not retrieve list!")
     }
   };
 
@@ -49,17 +49,17 @@ const initializeDatabase = async () => {
 
       const contact = rows[0];
       if (!contact) {
-        throw Error(` contact with id = ${id} doesnt exist`);
+        throw new Error(` contact with id = ${id} doesnt exist`);
       } else return contact;
     } catch (err) {
-      throw Error(`could not get contact with id = ${id}` + err.message);
+      throw new Error(`could not get contact with id = ${id}` + err.message);
     }
   };
 
   const createContact = async props => {
     const { name, email } = props;
-    if (!props && !name && !email) {
-      throw Error("you must provide a name and email");
+    if (!props || !name || !email) {
+      throw new Error("you must provide a name and email");
     }
     try {
       const result = await db.run(
@@ -68,7 +68,7 @@ const initializeDatabase = async () => {
       const id = result.stmt.lastID;
       return id;
     } catch (err) {
-      throw Error("cannot insert this combination of name and email");
+      throw new Error("cannot insert this combination of name and email");
     }
   };
 
@@ -78,18 +78,18 @@ const initializeDatabase = async () => {
         SQL`Delete from contacts where contact_id = ${id}`
       );
       if (result.stmt.changes === 0) {
-        throw Error(`could not delete contact with id = ${id}`);
+        throw new Error(`could not delete contact with id = ${id}`);
       }
       return true;
     } catch (err) {
-      throw Error("could not delete contact");
+      throw new Error("could not delete contact");
     }
   };
 
   const updateContact = async (id, props) => {
     const { name, email } = props;
     if (!props && !name && !email) {
-      throw Error("you must provide a name or an email");
+      throw new Error("you must provide a name or an email");
     }
     try {
       let stmt;
@@ -103,11 +103,11 @@ const initializeDatabase = async () => {
       console.log(stmt);
       const result = await db.run(stmt);
       if (result.stmt.changes === 0) {
-        throw Error(`could not update the contact with id = ${id}`);
+        throw new Error(`could not update the contact with id = ${id}`);
       }
       return true;
     } catch (err) {
-      throw Error(`could not update the contact with id = ${id}` + err.message);
+      throw new Error(`could not update the contact with id = ${id}` + err.message);
     }
   };
 
