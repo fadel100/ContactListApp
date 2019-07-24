@@ -5,13 +5,16 @@
   "dependencies": {
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1"
+    "react-scripts": "3.0.1",
+    "react-spring": "^8.0.27",
+    "react-toastify": "^5.3.2"
   },
   "scripts": {
     "start": "BROWSER=firefox react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "docs": "jsdoc src -r -d docs"
   },
   "eslintConfig": {
     "extends": "react-app"

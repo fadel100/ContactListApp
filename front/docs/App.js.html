@@ -1,12 +1,35 @@
-import React from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: App.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: App.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import {pause} from './utils/utils.js';
-import AddContactForm from './components/AddContactForm/AddContactForm.js'
-import ContactList from './components/ContactList/ContactList.js'
-import Header from './components/Header/Header.js'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Contact from './components/Contact/Contact.js'
 
 /**
  * My component App that prints the list of contacts
@@ -26,7 +49,8 @@ class App extends React.Component {
   state = {
     contacts: [],
     error_message: "", 
-    isLoading: false
+    name:"",
+    email:""
   };
 
   /**
@@ -47,25 +71,18 @@ class App extends React.Component {
    *
    */
   getContactsList = async () => {
-    this.setState({isLoading:true})
     try {
       const response = await fetch("http://localhost:8080/contacts/list");
-      await pause();
       const answer = await response.json();
       if (answer.success) {
-        toast("contacts loaded",{
-          className: 'black-background',
-          bodyClassName: "grow-font-size",
-          progressClassName: 'fancy-progress-bar'
-        }); 
-        this.setState({ contacts: answer.result, isLoading:false });
+        this.setState({ contacts: answer.result });
       } else {
         console.log();
-        this.setState({ error_message: answer.message, isLoading:false });
+        this.setState({ error_message: answer.message });
       }
     } catch (err) {
       console.log("error", err);
-      this.setState({ error_message: err.message, isLoading:false });
+      this.setState({ error_message: err.message });
     }
   };
 
@@ -85,26 +102,24 @@ class App extends React.Component {
       console.log(prev_contact)
       return prev_contact;
     } else {
-      this.setState({isLoading:true})
       //otherwise fetch from the server
       try {
         const response = await fetch(
           `http://localhost:8080/contacts/get/${id}`
         );
-        await pause();
         const answer = await response.json();
         if (answer.success) {
           //update the contact list in state to include the new contact
           const contacts = [...this.state.contacts];
           contacts.push(answer.result);
           console.log(answer.result)
-          this.setState({ contacts, isLoading:false });
+          this.setState({ contacts });
         } else {
-          this.setState({ error_message: answer.message, isLoading:false });
+          this.setState({ error_message: answer.message });
         }
       } catch (err) {
         console.log("error", err);
-        this.setState({ error_message: err.message, isLoading:false });
+        this.setState({ error_message: err.message });
       }
     }
   };
@@ -118,23 +133,21 @@ class App extends React.Component {
    *
    */
   deleteContact = async id =>{
-    this.setState({isLoading:true})
     try {
       const response = await fetch(`http://localhost:8080/contacts/delete/${id}`);
-      await pause();
       const answer = await response.json();
       if (answer.success) {
         const contacts  = this.state.contacts.filter(
           contact => contact.id !== id
         )
-        this.setState({ contacts, isLoading:false });
+        this.setState({ contacts });
       } else {
         console.log();
-        this.setState({ error_message: answer.message, isLoading:false });
+        this.setState({ error_message: answer.message });
       }
     } catch (err) {
       console.log("error", err);
-      this.setState({ error_message: err.message , isLoading:false});
+      this.setState({ error_message: err.message });
     }
   }
 
@@ -149,24 +162,22 @@ class App extends React.Component {
    */
   updateContact = async (id, parameters) =>{
     const {email, name} = parameters;
-    if(!parameters && !email && !name){
+    if(!parameters &amp;&amp; !email &amp;&amp; !name){
       throw new Error("You need to provide an email or name");
     }
-    this.setState({isLoading:true})
     try {
       let url="";
-      if(name && email){
-        url = `http://localhost:8080/contacts/update/${id}?name=${name}&email=${email}`
+      if(name &amp;&amp; email){
+        url = `http://localhost:8080/contacts/update/${id}?name=${name}&amp;email=${email}`
       }
-      if(name && !email){
+      if(name &amp;&amp; !email){
         url = `http://localhost:8080/contacts/update/${id}?name=${name}`
       }
-      if(email && !name){
+      if(email &amp;&amp; !name){
         url = `http://localhost:8080/contacts/update/${id}?email=${email}`
       
       }
       const response = await fetch(url);
-      await pause();
       const answer = await response.json();
       if (answer.success) {
         const contacts  = this.state.contacts.map(
@@ -183,14 +194,14 @@ class App extends React.Component {
             return contact;
           }
         )
-        this.setState({ contacts, isLoading:false });
+        this.setState({ contacts });
       } else {
         console.log();
-        this.setState({ error_message: answer.message, isLoading:false});
+        this.setState({ error_message: answer.message });
       }
     } catch (err) {
       console.log("error", err);
-      this.setState({ error_message: err.message,isLoading:false });
+      this.setState({ error_message: err.message });
     }
   }
 
@@ -205,14 +216,12 @@ class App extends React.Component {
    */
   createContact = async ( parameters) =>{
     const {email, name} = parameters;
-    if(!parameters || (!email && !name)){
+    if(!parameters || (!email &amp;&amp; !name)){
       throw new Error("You need to provide an email and name");
     }
-    this.setState({isLoading:true})
     try {
       
-      const response = await fetch(`http://localhost:8080/contacts/new?email=${email}&name=${name}`);
-      await pause();
+      const response = await fetch(`http://localhost:8080/contacts/new?email=${email}&amp;name=${name}`);
       const answer = await response.json();
       if (answer.success) {
         
@@ -223,19 +232,19 @@ class App extends React.Component {
         }
         const contacts = [...this.state.contacts];
         contacts.push(new_contact);
-        this.setState({ contacts,isLoading:false });
+        this.setState({ contacts });
       } else {
         console.log();
-        this.setState({ error_message: answer.message,isLoading:false });
+        this.setState({ error_message: answer.message });
       }
     } catch (err) {
       console.log("error", err);
-      this.setState({ error_message: err.message,isLoading:false });
+      this.setState({ error_message: err.message });
     }
   }
 
-  onSubmit = (name, email)=>{
-   // const {name, email} = this.state;
+  onSubmit = ()=>{
+    const {name, email} = this.state;
     this.createContact({name, email});
     this.setState({
       name:"",
@@ -251,19 +260,67 @@ class App extends React.Component {
 
   render() {
     return (
-      <>
-      <Header></Header>
-        {this.state.error_message && <p>ERROR!{this.state.error_message}</p>}
-        <div className="App">
-        {this.state.isLoading?<p>Loading...</p>: <ContactList contacts={this.state.contacts} updateContact={this.updateContact} deleteContact={this.deleteContact}/>
-         }
-       <AddContactForm onSubmit={this.onSubmit}></AddContactForm>
-       <ToastContainer />
+      &lt;>
+        {this.state.error_message &amp;&amp; &lt;p>ERROR!{this.state.error_message}&lt;/p>}
+        &lt;div className="App">
+          {this.state.contacts.map(contact => (
+           
+            &lt;Contact
+            key = {contact.id}
+            id= {contact.id}
+            name= {contact.name}
+            email = {contact.email}
+            updateContact = {this.updateContact}
+            deleteContact = {this.deleteContact}
+            />
 
-          </div>
-      </>
+          ))}
+          &lt;form  onSubmit={this.onSubmit}>
+          &lt;input
+            type="text"
+            placeholder="name"
+            onChange={evt => this.setState({ name: evt.target.value })}
+            value={this.state.name}
+          />
+          &lt;input
+            type="text"
+            placeholder="email"
+            onChange={evt => this.setState({ email: evt.target.value })}
+            value={this.state.email}
+          />
+          &lt;div>
+            &lt;input type="submit" value="ok" />
+            &lt;input type="reset" value="cancel"  />
+          &lt;/div>
+        &lt;/form>
+
+          &lt;/div>
+      &lt;/>
     );
   }
 }
 
 export default App;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-Contact.html">Contact</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Jul 22 2019 16:46:54 GMT+0300 (EEST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

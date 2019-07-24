@@ -29,37 +29,227 @@
             <pre class="prettyprint source linenums"><code>import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
+import Contact from './components/Contact/Contact.js'
 
 /**
  * My component App that prints the list of contacts
  *
- * @namespace App
+ * @module App
  */
 
 class App extends React.Component {
   /**
    * @type {object}
    * @property {array} contacts - holds the contact objects
+   * @property {string} error_message -holds the error message
+   * @property {string} name - tracks the name entered in the add form
+   * @property {string} email - tracks the email entered in the add form
    */
 
   state = {
-    contacts: []
+    contacts: [],
+    error_message: "", 
+    name:"",
+    email:""
   };
 
   /**
-   * When the component mounts fetches the list of contact and sets them in state.
+   * When the component mounts calls funcion getContactsList.
    * @function componentDidMount
    * @return {null}
    *
    */
   async componentDidMount() {
+    this.getContactsList();
+  }
+
+  /**
+   * fetches the list of contact and sets them in state.
+   * @function getContactsList
+   * @async 
+   * @return {null}
+   *
+   */
+  getContactsList = async () => {
     try {
       const response = await fetch("http://localhost:8080/contacts/list");
-      const result = await response.json();
-      this.setState({ contacts: result });
+      const answer = await response.json();
+      if (answer.success) {
+        this.setState({ contacts: answer.result });
+      } else {
+        console.log();
+        this.setState({ error_message: answer.message });
+      }
     } catch (err) {
       console.log("error", err);
+      this.setState({ error_message: err.message });
     }
+  };
+
+  /**
+   * Retrieves a contact with the given id.
+   * @function getContact
+   * @async 
+   * @param {number} id - the id  of contact that is to be retrieved
+   * @return {null}
+   *
+   */
+  getContact = async id => {
+    //check if contact exists in state
+    const prev_contact = this.state.contacts.find(contact => contact.id === id);
+    if (prev_contact) {
+      //return if from state
+      console.log(prev_contact)
+      return prev_contact;
+    } else {
+      //otherwise fetch from the server
+      try {
+        const response = await fetch(
+          `http://localhost:8080/contacts/get/${id}`
+        );
+        const answer = await response.json();
+        if (answer.success) {
+          //update the contact list in state to include the new contact
+          const contacts = [...this.state.contacts];
+          contacts.push(answer.result);
+          console.log(answer.result)
+          this.setState({ contacts });
+        } else {
+          this.setState({ error_message: answer.message });
+        }
+      } catch (err) {
+        console.log("error", err);
+        this.setState({ error_message: err.message });
+      }
+    }
+  };
+
+   /**
+   * deletes a contact from the contact list
+   * @function deleteContact
+   * @async 
+   * @param {number} id - the id  of contact that is to be deleted
+   * @return {null}
+   *
+   */
+  deleteContact = async id =>{
+    try {
+      const response = await fetch(`http://localhost:8080/contacts/delete/${id}`);
+      const answer = await response.json();
+      if (answer.success) {
+        const contacts  = this.state.contacts.filter(
+          contact => contact.id !== id
+        )
+        this.setState({ contacts });
+      } else {
+        console.log();
+        this.setState({ error_message: answer.message });
+      }
+    } catch (err) {
+      console.log("error", err);
+      this.setState({ error_message: err.message });
+    }
+  }
+
+   /**
+   * updates the email, name, or both of a contact with the given id.
+   * @function updateContact
+   * @async
+   * @param {number} id - the id  of contact that is to be retrieved
+   * @param {object} parameters - contains the email and name as an object
+   * @return {null}
+   *
+   */
+  updateContact = async (id, parameters) =>{
+    const {email, name} = parameters;
+    if(!parameters &amp;&amp; !email &amp;&amp; !name){
+      throw new Error("You need to provide an email or name");
+    }
+    try {
+      let url="";
+      if(name &amp;&amp; email){
+        url = `http://localhost:8080/contacts/update/${id}?name=${name}&amp;email=${email}`
+      }
+      if(name &amp;&amp; !email){
+        url = `http://localhost:8080/contacts/update/${id}?name=${name}`
+      }
+      if(email &amp;&amp; !name){
+        url = `http://localhost:8080/contacts/update/${id}?email=${email}`
+      
+      }
+      const response = await fetch(url);
+      const answer = await response.json();
+      if (answer.success) {
+        const contacts  = this.state.contacts.map(
+          contact => {
+            if(contact.id === id){
+              const updated_contact = {
+                id: contact.id,
+                name: name || contact.name,
+                email: email||contact.email
+              }
+              return updated_contact
+            }
+            else
+            return contact;
+          }
+        )
+        this.setState({ contacts });
+      } else {
+        console.log();
+        this.setState({ error_message: answer.message });
+      }
+    } catch (err) {
+      console.log("error", err);
+      this.setState({ error_message: err.message });
+    }
+  }
+
+
+   /**
+   * creates a component with the given email and name
+   * @function createContact
+   * @async
+   * @param {object} parameters - contains the name and email
+   * @return {null}
+   *
+   */
+  createContact = async ( parameters) =>{
+    const {email, name} = parameters;
+    if(!parameters || (!email &amp;&amp; !name)){
+      throw new Error("You need to provide an email and name");
+    }
+    try {
+      
+      const response = await fetch(`http://localhost:8080/contacts/new?email=${email}&amp;name=${name}`);
+      const answer = await response.json();
+      if (answer.success) {
+        
+        const new_contact = {
+          id: answer.result,
+          name,
+          email
+        }
+        const contacts = [...this.state.contacts];
+        contacts.push(new_contact);
+        this.setState({ contacts });
+      } else {
+        console.log();
+        this.setState({ error_message: answer.message });
+      }
+    } catch (err) {
+      console.log("error", err);
+      this.setState({ error_message: err.message });
+    }
+  }
+
+  onSubmit = ()=>{
+    const {name, email} = this.state;
+    this.createContact({name, email});
+    this.setState({
+      name:"",
+      email:""
+    })
   }
   /**
    * Renders the component.
@@ -70,13 +260,42 @@ class App extends React.Component {
 
   render() {
     return (
-      &lt;div className="App">
-        {this.state.contacts.map(contact => (
-          &lt;div key={contact.id}>
-            &lt;p>{contact.name}&lt;/p>
+      &lt;>
+        {this.state.error_message &amp;&amp; &lt;p>ERROR!{this.state.error_message}&lt;/p>}
+        &lt;div className="App">
+          {this.state.contacts.map(contact => (
+           
+            &lt;Contact
+            key = {contact.id}
+            id= {contact.id}
+            name= {contact.name}
+            email = {contact.email}
+            updateContact = {this.updateContact}
+            deleteContact = {this.deleteContact}
+            />
+
+          ))}
+          &lt;form  onSubmit={this.onSubmit}>
+          &lt;input
+            type="text"
+            placeholder="name"
+            onChange={evt => this.setState({ name: evt.target.value })}
+            value={this.state.name}
+          />
+          &lt;input
+            type="text"
+            placeholder="email"
+            onChange={evt => this.setState({ email: evt.target.value })}
+            value={this.state.email}
+          />
+          &lt;div>
+            &lt;input type="submit" value="ok" />
+            &lt;input type="reset" value="cancel"  />
           &lt;/div>
-        ))}
-      &lt;/div>
+        &lt;/form>
+
+          &lt;/div>
+      &lt;/>
     );
   }
 }
@@ -92,13 +311,13 @@ export default App;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="App.html">App</a></li></ul><h3>Global</h3><ul><li><a href="global.html#componentDidMount">componentDidMount</a></li><li><a href="global.html#render">render</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Jul 19 2019 08:52:34 GMT+0300 (EEST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Jul 22 2019 16:17:45 GMT+0300 (EEST)
 </footer>
 
 <script> prettyPrint(); </script>
