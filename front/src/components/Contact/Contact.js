@@ -62,8 +62,8 @@ class Contact extends React.Component{
     <div className="Contact-container">
       <h4><b>{name}</b></h4>
       <p>{email}</p>
-      <button className="button" onClick={()=>deleteContact(id)}>delete</button>
-      <button className="button" onClick={this.toggleEditMode}>edit</button>
+      <button className="App-button" onClick={()=>deleteContact(id)}>delete</button>
+      <button className="App-button" onClick={this.toggleEditMode}>edit</button>
     </div>
   /* </div>  */
     )

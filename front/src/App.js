@@ -5,8 +5,10 @@ import {pause} from './utils/utils.js';
 import AddContactForm from './components/AddContactForm/AddContactForm.js'
 import ContactList from './components/ContactList/ContactList.js'
 import Header from './components/Header/Header.js'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+ import 'react-toastify/dist/ReactToastify.min.css' ;
+ import { ToastContainer, toast } from 'react-toastify';
+ /*import { css } from 'glamor' */
+
 
 /**
  * My component App that prints the list of contacts
@@ -53,11 +55,7 @@ class App extends React.Component {
       await pause();
       const answer = await response.json();
       if (answer.success) {
-        toast("contacts loaded",{
-          className: 'black-background',
-          bodyClassName: "grow-font-size",
-          progressClassName: 'fancy-progress-bar'
-        }); 
+        toast("contacts loaded"); 
         this.setState({ contacts: answer.result, isLoading:false });
       } else {
         console.log();
@@ -258,9 +256,10 @@ class App extends React.Component {
         {this.state.isLoading?<p>Loading...</p>: <ContactList contacts={this.state.contacts} updateContact={this.updateContact} deleteContact={this.deleteContact}/>
          }
        <AddContactForm onSubmit={this.onSubmit}></AddContactForm>
-       <ToastContainer />
+      
 
           </div>
+          <ToastContainer  />
       </>
     );
   }
