@@ -26,25 +26,22 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import React from 'react';
-
+            <pre class="prettyprint source linenums"><code>import React from "react";
+import "./Contact.css";
 /**
  * My component Contact that renders a Contact with the ability to delete and update
  *
  * @module Contact
  * @extends Component
  */
-class Contact extends React.Component{
-
+class Contact extends React.Component {
   /**
    * @type {object}
    * @property {boolean} editMode - true if editmode is toggled on
    */
-  state={
-    editMode:false
-  }
-
-
+  state = {
+    editMode: false
+  };
 
   /**
    * toggles the state editMode
@@ -52,90 +49,84 @@ class Contact extends React.Component{
    * @return {null}
    *
    */
-  toggleEditMode= () =>
-  {
+  toggleEditMode = () => {
     const editMode = !this.state.editMode;
-    this.setState({editMode});
-  }
+    this.setState({ editMode });
+  };
 
-   /**
+  /**
    * reads input from the form and updates the contact
-   * @function onSubmit 
+   * @function onSubmit
    * @param {SyntheticEvent} evt- event that triggered the response
    * @return {null} - calls updateContact and toggles the edit mode
    */
-  onSubmit = (evt) =>{
+  onSubmit = evt => {
     evt.preventDefault();
 
     const name = evt.target.input_name.value;
     const email = evt.target.input_email.value;
 
-    const {id, updateContact} = this.props;
+    const { id, updateContact } = this.props;
 
-    updateContact(id, {name, email});
+    updateContact(id, { name, email });
     this.toggleEditMode();
-  }
+  };
 
   /**
    * renders the Contact as view only
-   * @function renderView 
+   * @function renderView
    * @return {ReactElement} - displays name and email with delete and update buttons
    */
-  renderView = () =>
-  {
-    const {id, name, email ,deleteContact} = this.props
-    return &lt;div>
-      &lt;span>{name} - {email}&lt;/span>
-      &lt;button onClick={()=>deleteContact(id)}>delete&lt;/button>
-      &lt;button onClick={this.toggleEditMode}>edit&lt;/button>
-    &lt;/div>
-  }
+  renderView = () => {
+    const { id, name, email, deleteContact } = this.props;
+    return (
+      &lt;div className="Contact-container">
+        &lt;h4>
+          &lt;b>{name}&lt;/b>
+        &lt;/h4>
+        &lt;p>{email}&lt;/p>
+        &lt;button className="App-button" onClick={() => deleteContact(id)}>
+          delete
+        &lt;/button>
+        &lt;button className="App-button" onClick={this.toggleEditMode}>
+          edit
+        &lt;/button>
+      &lt;/div>
+    );
+  };
 
-   /**
+  /**
    * renders the Contact as edit
-   * @function renderEdit 
+   * @function renderEdit
    * @return {ReactElement} - displays form to update name and email
    */
-  renderEdit = () =>
-  {
-    const {id, name, email} = this.props
+  renderEdit = () => {
+    const { id, name, email } = this.props;
     return (
-    &lt;form onSubmit={this.onSubmit} onReset = {this.toggleEditMode}>
-            &lt;input 
-            type="text"
-            name='input_name'
-            defaultValue={name}
-            >&lt;/input>
-            &lt;input
-             type="text"
-             name= 'input_email'
-             defaultValue={email}
-             
-            >&lt;/input>
-            &lt;div>
-              &lt;input type="submit" value='ok'>&lt;/input>
-              &lt;input type="reset" value='cancel'>&lt;/input>
-            &lt;/div>
-            &lt;/form>);
-  }
+      &lt;div className="Contact-container">
+        &lt;form onSubmit={this.onSubmit} onReset={this.toggleEditMode}>
+          &lt;input type="text" name="input_name" defaultValue={name} />
+          &lt;input type="text" name="input_email" defaultValue={email} />
+          &lt;div>
+            &lt;input type="submit" value="ok" />
+            &lt;input type="reset" value="cancel" />
+          &lt;/div>
+        &lt;/form>
+      &lt;/div>
+    );
+  };
 
-   /**
+  /**
    * renders the contact depending on editMode value
-   * @function render 
+   * @function render
    * @return {undefined} - calls renderEdit or renderView
    */
-  render(){
-    return(
-     this.state.editMode?
-       this.renderEdit()
-      
-      :
-        this.renderView()
-      
-    )
+  render() {
+    return this.state.editMode ? this.renderEdit() : this.renderView();
   }
 }
-export default Contact</code></pre>
+export default Contact;
+</code></pre>
         </article>
     </section>
 
@@ -145,13 +136,13 @@ export default Contact</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-App.html">App</a></li><li><a href="module-Contact.html">Contact</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AddContactForm.html">AddContactForm</a></li><li><a href="module-App.html">App</a></li><li><a href="module-Contact.html">Contact</a></li><li><a href="module-ContactList.html">ContactList</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Jul 22 2019 16:46:54 GMT+0300 (EEST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Jul 24 2019 12:47:28 GMT+0300 (EEST)
 </footer>
 
 <script> prettyPrint(); </script>
