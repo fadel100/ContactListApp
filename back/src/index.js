@@ -1,5 +1,6 @@
 import app from './app'
 import db from './db'
+import {isloggedIn, authenticateUser, logout} from './auth.js';
 import initializeDatabase from './db'
 
 const start = async()=>{
@@ -81,6 +82,22 @@ app.get('/contacts/update/:id', async(req, res, next)=>{
     next(err);
   }
 })
+
+app.get('/login', authenticateUser);
+
+app.get('/logout', logout);
+
+app.get('/mypage', isloggedIn, (req,res,next)=>{
+  const username = req.user.name;
+  res.json(
+    {
+      success:true,
+      result: "User" + username +"has access to this page"
+    }
+  )
+})
+
+
 
 app.use((err, req, res, next) => {
   console.error(err)

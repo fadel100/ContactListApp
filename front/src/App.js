@@ -1,12 +1,20 @@
 import React from "react";
+import { Switch, Route, withRouter } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
-import { pause } from "./utils/utils.js";
+import { pause, makeRequestUrl } from "./utils/utils.js";
 import AddContactForm from "./components/AddContactForm/AddContactForm.js";
 import ContactList from "./components/ContactList/ContactList.js";
 import Header from "./components/Header/Header.js";
 import "react-toastify/dist/ReactToastify.min.css";
 import { ToastContainer, toast } from "react-toastify";
+import AddContactPage from "./pages/AddContactPage/AddContactPage";
+import ContactsPage from "./pages/Contacts/ContactsPage";
+import HomePage from "./pages/HomePage/HomePage.js";
+
+const makeUrl = (path, params) => {
+  return makeRequestUrl(`http://localhost:8080/${path}`, params);
+};
 /*import { css } from 'glamor' */
 
 /**
@@ -27,7 +35,9 @@ class App extends React.Component {
   state = {
     contacts: [],
     error_message: "",
-    isLoading: false
+    isLoading: false,
+    nickname: null,
+    token: null
   };
 
   /**
@@ -50,7 +60,8 @@ class App extends React.Component {
   getContactsList = async () => {
     this.setState({ isLoading: true });
     try {
-      const response = await fetch("http://localhost:8080/contacts/list");
+      const url = makeUrl("contacts/list");
+      const response = await fetch(url);
       await pause();
       const answer = await response.json();
       if (answer.success) {
@@ -223,12 +234,14 @@ class App extends React.Component {
         contacts.push(new_contact);
         toast(`Contact was successfully created!`);
         this.setState({ contacts, isLoading: false });
+        console.log(this.props.match, this.props.history);
+        this.props.history.push("/mycontacts");
       } else {
         console.log();
         this.setState({ error_message: answer.message, isLoading: false });
       }
     } catch (err) {
-      console.log("error", err);
+      toast.error("error" + err);
       this.setState({ error_message: err.message, isLoading: false });
     }
   };
@@ -252,6 +265,82 @@ class App extends React.Component {
     });
   };
 
+  login = async (username, password) => {
+    const url = makeUrl("login", { username, password });
+    try {
+      const response = await fetch(url);
+      const answer = await response.json();
+      if (answer.success) {
+        const { nickname, token } = answer.result;
+        this.setState({ nickname, token });
+        toast("successful login!");
+      } else {
+        this.setState({ error_message: answer.message, isLoading: false });
+      }
+    } catch (err) {
+      console.log("error", err);
+      this.setState({ error_message: err.message, isLoading: false });
+    }
+  };
+
+  logout = async () => {
+    try {
+      const url = makeUrl(`logout`, { token: this.state.token });
+      const response = await fetch(url);
+      const answer = await response.json();
+      if (answer.success) {
+        this.setState({ token: null, nick: null });
+        toast(`successful logout`);
+      } else {
+        this.setState({ error_message: answer.message });
+        toast.error(answer.message);
+      }
+    } catch (err) {
+      this.setState({ error_message: err.message });
+      toast.error(err.message);
+    }
+  };
+
+  renderUser() {
+    const { token } = this.state;
+    console.log(token)
+    if (token) return this.renderUserLoggedIn();
+    else return this.renderUserLoggedOut();
+  };
+
+  renderUserLoggedIn(){
+    return(<> <div>Hello {this.state.nickname}</div>
+    <button onClick={this.logout}>Logout</button>
+    </>);
+  }
+
+  renderUserLoggedOut() {
+   
+     return( <form onSubmit={this.submitLogin}>
+        <input type = 'text' name="username" placeholder="enter username"/>
+       
+        <input type='password' name = "password" placeholder="enter password"/>
+        <input type="submit" value='ok'/>
+      </form>);
+    
+  }
+
+  submitLogin = (evt)=>{
+    evt.preventDefault();
+    const username = evt.target.username.value;
+    const password = evt.target.password.value;
+    if(!username){
+      toast.error("username can't be empty");
+      return
+    }
+    if(!password){
+      toast.error("password can't be empty");
+      return
+    }
+  
+    this.login(username, password)
+  }
+
   /**
    * Renders the component.
    * @function render
@@ -264,16 +353,32 @@ class App extends React.Component {
         <Header />
         {this.state.error_message && <p>ERROR!{this.state.error_message}</p>}
         <div className="App">
-          {this.state.isLoading ? (
-            <p>Loading...</p>
-          ) : (
-            <ContactList
-              contacts={this.state.contacts}
-              updateContact={this.updateContact}
-              deleteContact={this.deleteContact}
+          <Switch>
+            <Route path="/" exact render={props => <HomePage {...props} />} />
+            {/* <Route path="/contact/:id" render={} /> */}
+            <Route path="/myprofile" render={() => <div><h1>Profile</h1>
+            {this.renderUser()}
+            </div>} />
+            <Route
+              path="/mycontacts"
+              render={props => (
+                <ContactsPage
+                  {...props}
+                  contacts={this.state.contacts}
+                  updateContact={this.updateContact}
+                  deleteContact={this.deleteContact}
+                />
+              )}
             />
-          )}
-          <AddContactForm onSubmit={this.onSubmit} />
+            <Route
+              path="/addcontact"
+              render={props => (
+                <AddContactPage {...props} onSubmit={this.onSubmit} />
+              )}
+            />
+            }
+            <Route render={() => <div>Page not found!</div>} />
+          </Switch>
         </div>
         <ToastContainer />
       </>
@@ -281,4 +386,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withRouter(App);
