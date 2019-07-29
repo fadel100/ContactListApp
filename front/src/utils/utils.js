@@ -1,5 +1,24 @@
+
+/**
+ * creates a set timout with a given number of ms
+ * @param {number} ms the amount to wait in milliseconds
+ * @returns {Promise} returns a promise
+ */
 export const sleep = (ms) => new Promise( ok => setTimeout(ok, ms))
+
+/**
+ * generates a random number between a given range
+ * @param {number} max the upper range
+ * @param {number} min the lower range which defaults to 0
+ * @returns {number} returns a random integer
+ */
 export const getRandomInteger = (max, min=0) => Math.floor(Math.random() * (max - min + 1)) + min
+
+
+/**
+ * pauses a random amoung of milliseconds
+ * @returns {Promise} returns a promise
+ */
 export const pause = () =>sleep(getRandomInteger(1000,4000))
 
 /**

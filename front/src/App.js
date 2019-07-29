@@ -12,10 +12,17 @@ import AddContactPage from "./pages/AddContactPage/AddContactPage";
 import ContactsPage from "./pages/Contacts/ContactsPage";
 import HomePage from "./pages/HomePage/HomePage.js";
 
+/**
+ * @function makeUrl - generates a url with queries
+ * @param {String} path the route
+ * @param {Object} params -  an object of parameters 
+ * @returns {String} - the url
+ */
 const makeUrl = (path, params) => {
   return makeRequestUrl(`http://localhost:8080/${path}`, params);
 };
-/*import { css } from 'glamor' */
+
+
 
 /**
  * My component App that prints the list of contacts
@@ -265,6 +272,15 @@ class App extends React.Component {
     });
   };
 
+  /**
+   * tries to login in and if successful returns the nickname and token and sets them in state
+   * @function login
+   * @async
+   * @param {string} username - contains the username
+   * @param {string} password - contains the password
+   * @return {null}
+   *
+   */
   login = async (username, password) => {
     const url = makeUrl("login", { username, password });
     try {
@@ -283,6 +299,13 @@ class App extends React.Component {
     }
   };
 
+  /**
+   * tries to logout and removes token in state
+   * @function logout
+   * @async
+   * @return {null}
+   *
+   */
   logout = async () => {
     try {
       const url = makeUrl(`logout`, { token: this.state.token });
@@ -301,45 +324,74 @@ class App extends React.Component {
     }
   };
 
+  /**
+   * checks which render depending if the user is logged in or not
+   * @function renderUser
+   * @return {ReactElement} markup
+   *
+   */
   renderUser() {
     const { token } = this.state;
-    console.log(token)
+    console.log(token);
     if (token) return this.renderUserLoggedIn();
     else return this.renderUserLoggedOut();
-  };
-
-  renderUserLoggedIn(){
-    return(<> <div>Hello {this.state.nickname}</div>
-    <button onClick={this.logout}>Logout</button>
-    </>);
   }
 
+  /**
+   * renders user name and logout button
+   * @function renderUserLoggedIn
+   * @return {ReactElement} markup
+   *
+   */
+  renderUserLoggedIn() {
+    return (
+      <>
+        <div>Hello {this.state.nickname}</div>
+        <button onClick={this.logout}>Logout</button>
+      </>
+    );
+  }
+
+  /**
+   * renders form to ologin
+   * @function renderUserLoggedOut
+   * @return {ReactElement} markup
+   *
+   */
   renderUserLoggedOut() {
-   
-     return( <form onSubmit={this.submitLogin}>
-        <input type = 'text' name="username" placeholder="enter username"/>
-       
-        <input type='password' name = "password" placeholder="enter password"/>
-        <input type="submit" value='ok'/>
-      </form>);
-    
+    return (
+      <form onSubmit={this.submitLogin}>
+        <input type="text" name="username" placeholder="enter username" />
+
+        <input type="password" name="password" placeholder="enter password" />
+        <input type="submit" value="ok" />
+      </form>
+    );
   }
 
-  submitLogin = (evt)=>{
+
+   /**
+   * handles the login form
+   * @function submitLogin
+   * @param {SyntheticEvent} evt - event that triggered function
+   * @return {null}
+   *
+   */
+  submitLogin = evt => {
     evt.preventDefault();
     const username = evt.target.username.value;
     const password = evt.target.password.value;
-    if(!username){
+    if (!username) {
       toast.error("username can't be empty");
-      return
+      return;
     }
-    if(!password){
+    if (!password) {
       toast.error("password can't be empty");
-      return
+      return;
     }
-  
-    this.login(username, password)
-  }
+
+    this.login(username, password);
+  };
 
   /**
    * Renders the component.
@@ -356,9 +408,15 @@ class App extends React.Component {
           <Switch>
             <Route path="/" exact render={props => <HomePage {...props} />} />
             {/* <Route path="/contact/:id" render={} /> */}
-            <Route path="/myprofile" render={() => <div><h1>Profile</h1>
-            {this.renderUser()}
-            </div>} />
+            <Route
+              path="/myprofile"
+              render={() => (
+                <div>
+                  <h1>Profile</h1>
+                  {this.renderUser()}
+                </div>
+              )}
+            />
             <Route
               path="/mycontacts"
               render={props => (

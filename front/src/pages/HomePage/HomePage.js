@@ -1,7 +1,21 @@
 import React, { Component } from 'react';
 
+
+
+
+/**
+ * My component page that displays the home page
+ *
+ * @module HomePage
+ */
 class HomePage extends Component {
-  state = {  }
+  
+  /**
+   * Renders the component.
+   * @function render
+   * @return {ReactElement} markup
+   *
+   */
   render() { 
     return (
       <div>Home</div>
