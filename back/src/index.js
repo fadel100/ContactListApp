@@ -2,6 +2,8 @@ import app from './app'
 import db from './db'
 import {isloggedIn, authenticateUser, logout} from './auth.js';
 import initializeDatabase from './db'
+const PORT = process.env.PORT || 8080;
+
 
 const start = async()=>{
 const controller = await initializeDatabase();
@@ -106,7 +108,7 @@ app.use((err, req, res, next) => {
 })
 
 
-app.listen(8080, ()=>{console.log("server listening on port 8080")});
+app.listen(PORT, ()=>{console.log(`server listening on port ${PORT}`)});
 }
 start();
 
