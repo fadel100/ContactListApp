@@ -27,7 +27,6 @@ app.use(express.static(path.join(__dirname, '../public'))); // <-- location of p
   resave: true,
   saveUninitialized: true
 })) */
-const PORT = process.env.PORT || 3000;
 
 export default app;
 
